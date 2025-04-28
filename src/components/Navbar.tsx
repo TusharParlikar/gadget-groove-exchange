@@ -1,9 +1,8 @@
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ShoppingCart, Menu, X, Search, Guitar, Package2 } from "lucide-react";
+import { ShoppingCart, Menu, X, Search, Guitar, Package2, Camera } from "lucide-react";
 import { cn } from '@/lib/utils';
 
 const Navbar = () => {
@@ -26,8 +25,10 @@ const Navbar = () => {
           <div className="hidden md:flex items-center space-x-8">
             <Link to="/" className="font-medium hover:text-primary transition-colors">Home</Link>
             <Link to="/products" className="font-medium hover:text-primary transition-colors">Browse</Link>
-            <Link to="/products?category=electronics" className="font-medium hover:text-primary transition-colors">Electronics</Link>
-            <Link to="/products?category=instruments" className="font-medium hover:text-primary transition-colors">Instruments</Link>
+            <Link to="/camera" className="font-medium hover:text-primary transition-colors">
+              <Camera className="h-4 w-4 inline mr-1" />
+              Sell Item
+            </Link>
           </div>
 
           {/* Search and Actions */}
@@ -43,7 +44,9 @@ const Navbar = () => {
             <Button variant="ghost" size="icon">
               <ShoppingCart className="h-5 w-5" />
             </Button>
-            <Button>Sign In</Button>
+            <Link to="/login">
+              <Button>Sign In</Button>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -71,11 +74,12 @@ const Navbar = () => {
           </div>
           <Link to="/" onClick={() => setIsMenuOpen(false)} className="py-2 px-4 hover:bg-muted rounded-lg">Home</Link>
           <Link to="/products" onClick={() => setIsMenuOpen(false)} className="py-2 px-4 hover:bg-muted rounded-lg">Browse</Link>
-          <Link to="/products?category=electronics" onClick={() => setIsMenuOpen(false)} className="py-2 px-4 hover:bg-muted rounded-lg">Electronics</Link>
-          <Link to="/products?category=instruments" onClick={() => setIsMenuOpen(false)} className="py-2 px-4 hover:bg-muted rounded-lg">Instruments</Link>
+          <Link to="/camera" onClick={() => setIsMenuOpen(false)} className="py-2 px-4 hover:bg-muted rounded-lg">Sell Item</Link>
           <div className="pt-2 flex flex-col space-y-2">
-            <Button>Sign In</Button>
-            <Button variant="outline" className="flex items-center">
+            <Link to="/login" onClick={() => setIsMenuOpen(false)}>
+              <Button className="w-full">Sign In</Button>
+            </Link>
+            <Button variant="outline" className="flex items-center w-full">
               <ShoppingCart className="h-4 w-4 mr-2" /> View Cart
             </Button>
           </div>
