@@ -1,87 +1,38 @@
 
-import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useState } from "react";
 import { products } from "@/data/products";
-import { categories } from "@/data/categories";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import ProductCard from "@/components/ProductCard";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
-import { Checkbox } from "@/components/ui/checkbox";
-import { 
-  Select, SelectContent, SelectItem, 
-  SelectTrigger, SelectValue 
-} from "@/components/ui/select";
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import { SlidersHorizontal } from "lucide-react";
+import { useProductFilters } from "@/hooks/useProductFilters";
+import FilterSidebar from "@/components/products/FilterSidebar";
+import ProductSort from "@/components/products/ProductSort";
+import ActiveFilters from "@/components/products/ActiveFilters";
+import ProductsGrid from "@/components/products/ProductsGrid";
 
 const Products = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const categoryParam = searchParams.get("category") || "";
-  const searchParam = searchParams.get("search") || "";
-  
-  const [searchTerm, setSearchTerm] = useState(searchParam);
-  const [selectedCategory, setSelectedCategory] = useState(categoryParam);
-  const [priceRange, setPriceRange] = useState([0, 166000]);  // Using rupee equivalent (2000 * 83)
-  const [condition, setCondition] = useState<string[]>([]);
-  const [sortBy, setSortBy] = useState("newest");
-  const [filtersVisible, setFiltersVisible] = useState(false);
-
-  // Update search term when URL parameter changes
-  useEffect(() => {
-    if (searchParam) {
-      setSearchTerm(searchParam);
-    }
-  }, [searchParam]);
-  
-  // Filter products based on current filters
-  const filteredProducts = products.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          product.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory ? product.category === selectedCategory : true;
-    const rupeesPrice = product.price * 83;
-    const matchesPrice = rupeesPrice >= priceRange[0] && rupeesPrice <= priceRange[1];
-    const matchesCondition = condition.length > 0 ? condition.includes(product.condition) : true;
-    
-    return matchesSearch && matchesCategory && matchesPrice && matchesCondition;
-  });
-  
-  // Sort products
-  const sortedProducts = [...filteredProducts].sort((a, b) => {
-    switch (sortBy) {
-      case "price-low":
-        return a.price - b.price;
-      case "price-high":
-        return b.price - a.price;
-      case "newest":
-      default:
-        return new Date(b.datePosted).getTime() - new Date(a.datePosted).getTime();
-    }
-  });
-  
-  // Clear all filters
-  const clearFilters = () => {
-    setSearchTerm("");
-    setSelectedCategory("");
-    setPriceRange([0, 166000]);
-    setCondition([]);
-    setSortBy("newest");
-    setSearchParams({});
-  };
-
-  // Handle search submit
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSearchParams(params => {
-      if (searchTerm) {
-        params.set("search", searchTerm);
-      } else {
-        params.delete("search");
-      }
-      return params;
-    });
-  };
+  const {
+    searchTerm,
+    setSearchTerm,
+    selectedCategory,
+    setSelectedCategory,
+    priceRange,
+    setPriceRange,
+    condition,
+    setCondition,
+    sortBy,
+    setSortBy,
+    filtersVisible,
+    setFiltersVisible,
+    sortedProducts,
+    clearFilters,
+    clearSearchTerm,
+    clearCategory,
+    clearCondition,
+    resetPriceRange,
+    handleSearchSubmit,
+  } = useProductFilters(products);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -103,198 +54,44 @@ const Products = () => {
           <div className="flex flex-col md:flex-row gap-8">
             {/* Filters */}
             <aside className={`w-full md:w-64 md:block ${filtersVisible ? 'block' : 'hidden'}`}>
-              <div className="bg-white p-6 rounded-lg border mb-4">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="font-semibold">Filters</h2>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={clearFilters} 
-                    className="h-8 text-xs active:scale-95 transition-transform"
-                  >
-                    Clear All
-                  </Button>
-                </div>
-
-                <div className="space-y-6">
-                  {/* Search */}
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Search</label>
-                    <form onSubmit={handleSearchSubmit} className="relative">
-                      <Input
-                        placeholder="Search products..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-9"
-                      />
-                      <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                      <button type="submit" className="sr-only">Search</button>
-                    </form>
-                  </div>
-
-                  {/* Category */}
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Category</label>
-                    <Select
-                      value={selectedCategory}
-                      onValueChange={(value) => {
-                        setSelectedCategory(value);
-                        setSearchParams(params => {
-                          if (value && value !== "all") {
-                            params.set("category", value);
-                          } else {
-                            params.delete("category");
-                          }
-                          return params;
-                        });
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="All Categories" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Categories</SelectItem>
-                        {categories.map(category => (
-                          <SelectItem key={category.id} value={category.id}>
-                            {category.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Price Range */}
-                  <div>
-                    <label className="text-sm font-medium mb-4 block">Price Range (₹)</label>
-                    <Slider
-                      defaultValue={priceRange}
-                      max={166000}
-                      step={4150}  // 50 * 83
-                      onValueChange={setPriceRange}
-                      className="my-6"
-                    />
-                    <div className="flex items-center justify-between text-sm">
-                      <span>₹{priceRange[0]}</span>
-                      <span>₹{priceRange[1]}</span>
-                    </div>
-                  </div>
-
-                  {/* Condition */}
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Condition</label>
-                    <div className="space-y-2">
-                      {["New", "Like New", "Good", "Fair", "Poor"].map((c) => (
-                        <div key={c} className="flex items-center space-x-2">
-                          <Checkbox
-                            id={`condition-${c}`}
-                            checked={condition.includes(c)}
-                            onCheckedChange={(checked) => {
-                              if (checked) {
-                                setCondition([...condition, c]);
-                              } else {
-                                setCondition(condition.filter(item => item !== c));
-                              }
-                            }}
-                          />
-                          <label htmlFor={`condition-${c}`} className="text-sm">
-                            {c}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <FilterSidebar 
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+                selectedCategory={selectedCategory}
+                setSelectedCategory={setSelectedCategory}
+                priceRange={priceRange}
+                setPriceRange={setPriceRange}
+                condition={condition}
+                setCondition={setCondition}
+                clearFilters={clearFilters}
+                handleSearchSubmit={handleSearchSubmit}
+              />
             </aside>
 
             {/* Products */}
             <div className="flex-1">
-              <div className="mb-6 flex items-center justify-between">
-                <p className="text-muted-foreground">
-                  {sortedProducts.length} {sortedProducts.length === 1 ? 'product' : 'products'} found
-                </p>
-                <div className="flex items-center">
-                  <span className="text-sm mr-2">Sort by:</span>
-                  <Select
-                    value={sortBy}
-                    onValueChange={setSortBy}
-                  >
-                    <SelectTrigger className="w-[140px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="newest">Newest</SelectItem>
-                      <SelectItem value="price-low">Price: Low to High</SelectItem>
-                      <SelectItem value="price-high">Price: High to Low</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+              <ProductSort 
+                sortBy={sortBy} 
+                setSortBy={setSortBy} 
+                productCount={sortedProducts.length} 
+              />
 
               {/* Active Filters */}
-              {(searchTerm || selectedCategory || condition.length > 0 || 
-                priceRange[0] > 0 || priceRange[1] < 166000) && (
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {searchTerm && (
-                    <div className="bg-muted text-xs py-1 px-3 rounded-full flex items-center gap-1">
-                      Search: {searchTerm}
-                      <button onClick={() => {
-                        setSearchTerm("");
-                        setSearchParams(params => {
-                          params.delete("search");
-                          return params;
-                        });
-                      }}>
-                        <X className="h-3 w-3" />
-                      </button>
-                    </div>
-                  )}
-                  {selectedCategory && (
-                    <div className="bg-muted text-xs py-1 px-3 rounded-full flex items-center gap-1">
-                      Category: {categories.find(c => c.id === selectedCategory)?.name || selectedCategory}
-                      <button onClick={() => {
-                        setSelectedCategory("");
-                        setSearchParams(params => {
-                          params.delete("category");
-                          return params;
-                        });
-                      }}>
-                        <X className="h-3 w-3" />
-                      </button>
-                    </div>
-                  )}
-                  {condition.length > 0 && (
-                    <div className="bg-muted text-xs py-1 px-3 rounded-full flex items-center gap-1">
-                      Condition: {condition.join(", ")}
-                      <button onClick={() => setCondition([])}>
-                        <X className="h-3 w-3" />
-                      </button>
-                    </div>
-                  )}
-                  {(priceRange[0] > 0 || priceRange[1] < 166000) && (
-                    <div className="bg-muted text-xs py-1 px-3 rounded-full flex items-center gap-1">
-                      Price: ₹{priceRange[0]} - ₹{priceRange[1]}
-                      <button onClick={() => setPriceRange([0, 166000])}>
-                        <X className="h-3 w-3" />
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
+              <ActiveFilters 
+                searchTerm={searchTerm}
+                selectedCategory={selectedCategory}
+                condition={condition}
+                priceRange={priceRange}
+                clearSearchTerm={clearSearchTerm}
+                clearCategory={clearCategory}
+                clearCondition={clearCondition}
+                resetPriceRange={resetPriceRange}
+              />
 
-              {sortedProducts.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {sortedProducts.map(product => (
-                    <ProductCard key={product.id} product={product} />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-16">
-                  <h3 className="text-xl font-medium mb-2">No products found</h3>
-                  <p className="text-muted-foreground mb-4">Try adjusting your filters</p>
-                  <Button onClick={clearFilters} className="active:scale-95 transition-transform">Clear All Filters</Button>
-                </div>
-              )}
+              <ProductsGrid 
+                products={sortedProducts} 
+                clearFilters={clearFilters} 
+              />
             </div>
           </div>
         </div>
