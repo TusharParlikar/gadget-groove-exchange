@@ -10,6 +10,10 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
+  // Extract just the area name without pincode for display
+  const locationParts = product.location.split(',');
+  const areaName = locationParts[0].trim();
+  
   return (
     <Link to={`/product/${product.id}`}>
       <Card className="overflow-hidden card-hover h-full">
@@ -41,7 +45,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         <CardFooter className="px-4 pb-4 pt-0 flex items-center justify-between">
           <div className="flex items-center text-sm text-muted-foreground">
             <MapPin className="h-3 w-3 mr-1" />
-            {product.location}
+            {areaName}, Pune
           </div>
           <div className="flex items-center text-sm">
             <Star className="h-3 w-3 mr-1 fill-yellow-400 stroke-yellow-400" />

@@ -31,7 +31,7 @@ export const products: Product[] = [
       name: 'Mike Johnson',
       rating: 4.8
     },
-    location: 'Nashville, TN',
+    location: 'Koregaon Park, Pune - 411001',
     datePosted: '2025-04-15',
     featured: true
   },
@@ -48,7 +48,7 @@ export const products: Product[] = [
       name: 'Sarah Kim',
       rating: 4.9
     },
-    location: 'San Francisco, CA',
+    location: 'Hinjewadi, Pune - 411057',
     datePosted: '2025-04-20',
     featured: true
   },
@@ -65,7 +65,7 @@ export const products: Product[] = [
       name: 'David Chen',
       rating: 4.7
     },
-    location: 'Chicago, IL',
+    location: 'Kothrud, Pune - 411038',
     datePosted: '2025-04-18'
   },
   {
@@ -81,7 +81,7 @@ export const products: Product[] = [
       name: 'Rachel Green',
       rating: 4.6
     },
-    location: 'Austin, TX',
+    location: 'Aundh, Pune - 411007',
     datePosted: '2025-04-10',
     featured: true
   },
@@ -98,7 +98,7 @@ export const products: Product[] = [
       name: 'Alex Morgan',
       rating: 4.5
     },
-    location: 'Miami, FL',
+    location: 'Viman Nagar, Pune - 411014',
     datePosted: '2025-04-12'
   },
   {
@@ -114,7 +114,7 @@ export const products: Product[] = [
       name: 'John Smith',
       rating: 4.7
     },
-    location: 'Los Angeles, CA',
+    location: 'Hadapsar, Pune - 411028',
     datePosted: '2025-04-14'
   },
   {
@@ -130,7 +130,7 @@ export const products: Product[] = [
       name: 'Emma Wilson',
       rating: 4.8
     },
-    location: 'Seattle, WA',
+    location: 'Baner, Pune - 411045',
     datePosted: '2025-04-17',
     featured: true
   },
@@ -147,7 +147,7 @@ export const products: Product[] = [
       name: 'Mark Davis',
       rating: 4.9
     },
-    location: 'Portland, OR',
+    location: 'Shivaji Nagar, Pune - 411005',
     datePosted: '2025-04-19'
   }
 ];
