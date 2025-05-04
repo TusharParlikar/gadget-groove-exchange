@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Product } from '@/data/products';
-import { MapPin, Star } from "lucide-react";
+import { MapPin, Star, IndianRupee } from "lucide-react";
 
 interface ProductCardProps {
   product: Product;
@@ -28,7 +28,10 @@ const ProductCard = ({ product }: ProductCardProps) => {
         <CardContent className="p-4">
           <h3 className="font-semibold text-lg line-clamp-1">{product.name}</h3>
           <div className="flex justify-between items-center mt-2">
-            <span className="text-lg font-bold text-primary">${product.price.toFixed(2)}</span>
+            <span className="text-lg font-bold text-primary flex items-center">
+              <IndianRupee className="h-3 w-3 mr-1" />
+              {(product.price * 83).toFixed(0)}
+            </span>
             <Badge variant="outline">{product.condition}</Badge>
           </div>
           <p className="text-muted-foreground text-sm mt-2 line-clamp-2">

@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { products } from "@/data/products";
 import { categories } from "@/data/categories";
@@ -18,20 +19,29 @@ import { Search, SlidersHorizontal, X } from "lucide-react";
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const categoryParam = searchParams.get("category") || "";
+  const searchParam = searchParams.get("search") || "";
   
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(searchParam);
   const [selectedCategory, setSelectedCategory] = useState(categoryParam);
-  const [priceRange, setPriceRange] = useState([0, 2000]);
+  const [priceRange, setPriceRange] = useState([0, 166000]);  // Using rupee equivalent (2000 * 83)
   const [condition, setCondition] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("newest");
   const [filtersVisible, setFiltersVisible] = useState(false);
+
+  // Update search term when URL parameter changes
+  useEffect(() => {
+    if (searchParam) {
+      setSearchTerm(searchParam);
+    }
+  }, [searchParam]);
   
   // Filter products based on current filters
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                           product.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory ? product.category === selectedCategory : true;
-    const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
+    const rupeesPrice = product.price * 83;
+    const matchesPrice = rupeesPrice >= priceRange[0] && rupeesPrice <= priceRange[1];
     const matchesCondition = condition.length > 0 ? condition.includes(product.condition) : true;
     
     return matchesSearch && matchesCategory && matchesPrice && matchesCondition;
@@ -54,9 +64,23 @@ const Products = () => {
   const clearFilters = () => {
     setSearchTerm("");
     setSelectedCategory("");
-    setPriceRange([0, 2000]);
+    setPriceRange([0, 166000]);
     setCondition([]);
     setSortBy("newest");
+    setSearchParams({});
+  };
+
+  // Handle search submit
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSearchParams(params => {
+      if (searchTerm) {
+        params.set("search", searchTerm);
+      } else {
+        params.delete("search");
+      }
+      return params;
+    });
   };
 
   return (
@@ -68,7 +92,7 @@ const Products = () => {
             <h1 className="text-3xl font-bold">Browse Products</h1>
             <Button 
               variant="outline" 
-              className="md:hidden flex items-center gap-2"
+              className="md:hidden flex items-center gap-2 active:scale-95 transition-transform"
               onClick={() => setFiltersVisible(!filtersVisible)}
             >
               <SlidersHorizontal className="h-4 w-4" />
@@ -82,7 +106,12 @@ const Products = () => {
               <div className="bg-white p-6 rounded-lg border mb-4">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="font-semibold">Filters</h2>
-                  <Button variant="ghost" size="sm" onClick={clearFilters} className="h-8 text-xs">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={clearFilters} 
+                    className="h-8 text-xs active:scale-95 transition-transform"
+                  >
                     Clear All
                   </Button>
                 </div>
@@ -91,7 +120,7 @@ const Products = () => {
                   {/* Search */}
                   <div>
                     <label className="text-sm font-medium mb-2 block">Search</label>
-                    <div className="relative">
+                    <form onSubmit={handleSearchSubmit} className="relative">
                       <Input
                         placeholder="Search products..."
                         value={searchTerm}
@@ -99,7 +128,8 @@ const Products = () => {
                         className="pl-9"
                       />
                       <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    </div>
+                      <button type="submit" className="sr-only">Search</button>
+                    </form>
                   </div>
 
                   {/* Category */}
@@ -107,7 +137,17 @@ const Products = () => {
                     <label className="text-sm font-medium mb-2 block">Category</label>
                     <Select
                       value={selectedCategory}
-                      onValueChange={setSelectedCategory}
+                      onValueChange={(value) => {
+                        setSelectedCategory(value);
+                        setSearchParams(params => {
+                          if (value && value !== "all") {
+                            params.set("category", value);
+                          } else {
+                            params.delete("category");
+                          }
+                          return params;
+                        });
+                      }}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="All Categories" />
@@ -125,17 +165,17 @@ const Products = () => {
 
                   {/* Price Range */}
                   <div>
-                    <label className="text-sm font-medium mb-4 block">Price Range</label>
+                    <label className="text-sm font-medium mb-4 block">Price Range (₹)</label>
                     <Slider
                       defaultValue={priceRange}
-                      max={2000}
-                      step={50}
+                      max={166000}
+                      step={4150}  // 50 * 83
                       onValueChange={setPriceRange}
                       className="my-6"
                     />
                     <div className="flex items-center justify-between text-sm">
-                      <span>${priceRange[0]}</span>
-                      <span>${priceRange[1]}</span>
+                      <span>₹{priceRange[0]}</span>
+                      <span>₹{priceRange[1]}</span>
                     </div>
                   </div>
 
@@ -193,12 +233,18 @@ const Products = () => {
 
               {/* Active Filters */}
               {(searchTerm || selectedCategory || condition.length > 0 || 
-                priceRange[0] > 0 || priceRange[1] < 2000) && (
+                priceRange[0] > 0 || priceRange[1] < 166000) && (
                 <div className="flex flex-wrap gap-2 mb-4">
                   {searchTerm && (
                     <div className="bg-muted text-xs py-1 px-3 rounded-full flex items-center gap-1">
                       Search: {searchTerm}
-                      <button onClick={() => setSearchTerm("")}>
+                      <button onClick={() => {
+                        setSearchTerm("");
+                        setSearchParams(params => {
+                          params.delete("search");
+                          return params;
+                        });
+                      }}>
                         <X className="h-3 w-3" />
                       </button>
                     </div>
@@ -206,7 +252,13 @@ const Products = () => {
                   {selectedCategory && (
                     <div className="bg-muted text-xs py-1 px-3 rounded-full flex items-center gap-1">
                       Category: {categories.find(c => c.id === selectedCategory)?.name || selectedCategory}
-                      <button onClick={() => setSelectedCategory("")}>
+                      <button onClick={() => {
+                        setSelectedCategory("");
+                        setSearchParams(params => {
+                          params.delete("category");
+                          return params;
+                        });
+                      }}>
                         <X className="h-3 w-3" />
                       </button>
                     </div>
@@ -219,10 +271,10 @@ const Products = () => {
                       </button>
                     </div>
                   )}
-                  {(priceRange[0] > 0 || priceRange[1] < 2000) && (
+                  {(priceRange[0] > 0 || priceRange[1] < 166000) && (
                     <div className="bg-muted text-xs py-1 px-3 rounded-full flex items-center gap-1">
-                      Price: ${priceRange[0]} - ${priceRange[1]}
-                      <button onClick={() => setPriceRange([0, 2000])}>
+                      Price: ₹{priceRange[0]} - ₹{priceRange[1]}
+                      <button onClick={() => setPriceRange([0, 166000])}>
                         <X className="h-3 w-3" />
                       </button>
                     </div>
@@ -240,7 +292,7 @@ const Products = () => {
                 <div className="text-center py-16">
                   <h3 className="text-xl font-medium mb-2">No products found</h3>
                   <p className="text-muted-foreground mb-4">Try adjusting your filters</p>
-                  <Button onClick={clearFilters}>Clear All Filters</Button>
+                  <Button onClick={clearFilters} className="active:scale-95 transition-transform">Clear All Filters</Button>
                 </div>
               )}
             </div>

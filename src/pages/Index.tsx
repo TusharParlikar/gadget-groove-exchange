@@ -5,7 +5,8 @@ import CategorySection from "@/components/CategorySection";
 import FeaturedProducts from "@/components/FeaturedProducts";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { ShoppingBag, Truck, ShieldCheck, HeartHandshake } from "lucide-react";
+import { ShoppingBag, Truck, ShieldCheck, HeartHandshake, Camera } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Index = () => {
   return (
@@ -64,9 +65,15 @@ const Index = () => {
               Join thousands of users who have successfully sold their electronics and instruments on our platform.
               It's quick, easy, and free to list your items.
             </p>
-            <Button size="lg" variant="secondary">
-              Start Selling Now
-            </Button>
+            <Link to="/camera">
+              <Button 
+                size="lg" 
+                variant="secondary"
+                className="active:scale-95 transition-transform"
+              >
+                <Camera className="mr-2 h-4 w-4" /> Sell Now
+              </Button>
+            </Link>
           </div>
         </section>
       </main>

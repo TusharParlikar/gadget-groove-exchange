@@ -1,6 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { Camera } from "lucide-react";
 
 const Hero = () => {
   return (
@@ -16,13 +17,23 @@ const Hero = () => {
           </p>
           <div className="flex flex-wrap gap-4 slide-in">
             <Link to="/products">
-              <Button size="lg" variant="secondary">
+              <Button 
+                size="lg" 
+                variant="secondary"
+                className="active:scale-95 transition-transform"
+              >
                 Browse Products
               </Button>
             </Link>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
-              Sell an Item
-            </Button>
+            <Link to="/camera">
+              <Button 
+                size="lg" 
+                variant="secondary"
+                className="active:scale-95 transition-transform"
+              >
+                <Camera className="mr-2 h-4 w-4" /> Sell an Item
+              </Button>
+            </Link>
           </div>
         </div>
         <div className="md:w-1/2 grid grid-cols-2 gap-4">

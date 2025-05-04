@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import ProductCard from "@/components/ProductCard";
-import { ShoppingCart, Heart, Share2, MapPin, Calendar, Star } from "lucide-react";
+import { ShoppingCart, Heart, Share2, MapPin, Calendar, Star, IndianRupee } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const ProductDetail = () => {
@@ -94,8 +94,9 @@ const ProductDetail = () => {
                 </p>
               </div>
               
-              <div className="text-3xl font-bold text-primary mb-6">
-                ${product.price.toFixed(2)}
+              <div className="text-3xl font-bold text-primary mb-6 flex items-center">
+                <IndianRupee className="h-6 w-6 mr-1" />
+                {(product.price * 83).toFixed(0)}
               </div>
               
               <p className="text-gray-700 mb-6">
@@ -103,13 +104,13 @@ const ProductDetail = () => {
               </p>
               
               <div className="flex flex-wrap gap-4 mb-6">
-                <Button onClick={handleAddToCart} className="flex-1">
+                <Button onClick={handleAddToCart} className="flex-1 active:scale-95 transition-transform">
                   <ShoppingCart className="mr-2 h-4 w-4" /> Add to Cart
                 </Button>
-                <Button variant="outline" onClick={handleSaveToWishlist}>
+                <Button variant="outline" onClick={handleSaveToWishlist} className="active:scale-95 transition-transform">
                   <Heart className="h-4 w-4" />
                 </Button>
-                <Button variant="outline">
+                <Button variant="outline" className="active:scale-95 transition-transform">
                   <Share2 className="h-4 w-4" />
                 </Button>
               </div>
@@ -130,7 +131,7 @@ const ProductDetail = () => {
                       <span className="text-sm">{product.seller.rating} Rating</span>
                     </div>
                   </div>
-                  <Button size="sm" variant="outline" className="ml-auto">
+                  <Button size="sm" variant="outline" className="ml-auto active:scale-95 transition-transform">
                     Contact Seller
                   </Button>
                 </div>
